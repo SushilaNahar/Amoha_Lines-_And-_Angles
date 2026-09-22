@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Amoha's Shape &amp; Angle Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F3FB;
+    --bg-panel: #FFFFFF;
+    --ink: #2B2545;
+    --ink-soft: #6B6485;
+    --line: #E4DFF3;
+    --indigo: #4B3F8A;
+    --coral: #FF6B5B;
+    --teal: #2FB6A5;
+    --sun: #FFB93D;
+    --violet: #8C6FE0;
+    --good: #2FAE66;
+    --good-bg: #E7F8EE;
+    --bad: #E4463B;
+    --bad-bg: #FDEAE8;
+    --shadow: 0 10px 24px rgba(43,37,69,0.08);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1B1730;
+      --bg-panel: #241F3F;
+      --ink: #EFEBFF;
+      --ink-soft: #B3ABD4;
+      --line: #3A335C;
+      --shadow: 0 10px 24px rgba(0,0,0,0.35);
+      --good-bg: #163826;
+      --bad-bg: #3A1F1E;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1B1730;
+    --bg-panel: #241F3F;
+    --ink: #EFEBFF;
+    --ink-soft: #B3ABD4;
+    --line: #3A335C;
+    --shadow: 0 10px 24px rgba(0,0,0,0.35);
+    --good-bg: #163826;
+    --bad-bg: #3A1F1E;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 60px; }
+
+  /* Header */
+  .hero {
+    background: linear-gradient(135deg, var(--indigo), var(--violet));
+    border-radius: 24px;
+    padding: 28px 26px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .hero svg.deco { position: absolute; right: -10px; top: -20px; width: 160px; height: 160px; opacity: 0.18; }
+  .hero h1 {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: clamp(24px, 5vw, 34px);
+    margin: 0 0 6px;
+    letter-spacing: 0.2px;
+  }
+  .hero p { margin: 0; font-size: 15px; color: #E7E2FF; max-width: 60ch; }
+  .stars-row { display:flex; gap:6px; margin-top:14px; align-items:center; font-size:14px; color:#E7E2FF; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 10px; margin: 20px 0 18px; flex-wrap: wrap; }
+  .tab-btn {
+    flex: 1 1 160px;
+    border: 2px solid var(--line);
+    background: var(--bg-panel);
+    border-radius: 16px;
+    padding: 14px 12px;
+    cursor: pointer;
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: transform .12s ease, border-color .12s ease;
+    text-align: left;
+  }
+  .tab-btn:hover { transform: translateY(-2px); }
+  .tab-btn .ico { font-size: 22px; }
+  .tab-btn .meta { font-family:'Nunito',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); }
+  .tab-btn.active { border-color: var(--accent, var(--indigo)); background: color-mix(in srgb, var(--accent, var(--indigo)) 10%, var(--bg-panel)); }
+
+  /* Layout */
+  .layout { display: grid; grid-template-columns: 240px 1fr; gap: 18px; }
+  @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+
+  .sidebar {
+    background: var(--bg-panel);
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: var(--shadow);
+    height: fit-content;
+  }
+  .sidebar h3 { font-family:'Baloo 2',sans-serif; font-size:14px; margin: 6px 8px 10px; color: var(--ink-soft); font-weight:700; }
+  .lesson-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .lesson-item:hover { background: var(--bg); }
+  .lesson-item.current { background: color-mix(in srgb, var(--accent, var(--indigo)) 14%, var(--bg-panel)); }
+  .lesson-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items:center; justify-content:center;
+    background: var(--line); color: var(--ink-soft); font-size: 12px; flex: none;
+  }
+  .lesson-item.done .lesson-num { background: var(--good); color: #fff; }
+  .lesson-item.current .lesson-num { background: var(--accent, var(--indigo)); color: #fff; }
+  .lesson-title { line-height: 1.2; }
+
+  /* Panel */
+  .panel { background: var(--bg-panel); border-radius: 18px; padding: 22px 22px 26px; box-shadow: var(--shadow); min-height: 400px; }
+  .panel .eyebrow { color: var(--accent, var(--indigo)); font-weight: 800; font-size: 13px; margin-bottom: 4px; }
+  .panel h2 { font-family:'Baloo 2',sans-serif; font-size: 24px; margin: 0 0 12px; }
+  .explain { font-size: 15.5px; line-height: 1.65; color: var(--ink); }
+  .explain p { margin: 0 0 12px; }
+  .explain b { color: var(--accent, var(--indigo)); }
+  .diagram-row { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin: 16px 0; }
+  .diagram-card { background: var(--bg); border-radius: 14px; padding: 10px; text-align:center; }
+  .diagram-card .cap { font-size: 12px; font-weight:700; color: var(--ink-soft); margin-top:4px; }
+
+  .divider { border: none; border-top: 2px dashed var(--line); margin: 22px 0; }
+
+  .q-block { margin-bottom: 22px; }
+  .q-text { font-weight: 800; font-size: 15.5px; margin-bottom: 10px; }
+  .opt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; }
+  .opt-grid.text-opts { grid-template-columns: 1fr; }
+  .opt-btn {
+    border: 2px solid var(--line);
+    background: var(--bg-panel);
+    border-radius: 14px;
+    padding: 12px 10px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--ink);
+    text-align: center;
+    transition: border-color .1s ease;
+  }
+  .opt-btn:hover { border-color: var(--accent, var(--indigo)); }
+  .opt-btn.svg-opt { padding: 8px; }
+  .opt-btn.correct { border-color: var(--good); background: var(--good-bg); }
+  .opt-btn.wrong { border-color: var(--bad); background: var(--bad-bg); }
+  .opt-btn:disabled { cursor: default; }
+  .feedback { margin-top: 8px; font-weight: 700; font-size: 14px; padding: 8px 12px; border-radius: 10px; display:none; }
+  .feedback.good { display:block; background: var(--good-bg); color: var(--good); }
+  .feedback.bad { display:block; background: var(--bad-bg); color: var(--bad); }
+
+  .btn-row { display:flex; gap:10px; margin-top: 20px; flex-wrap: wrap; }
+  .btn {
+    border: none; border-radius: 12px; padding: 12px 20px;
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;
+    cursor: pointer; color: #fff; background: var(--accent, var(--indigo));
+  }
+  .btn.secondary { background: var(--bg); color: var(--ink); border: 2px solid var(--line); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  textarea.teach-box {
+    width: 100%; min-height: 100px; border-radius: 12px; border: 2px solid var(--line);
+    padding: 12px; font-family: 'Nunito', sans-serif; font-size: 14.5px; color: var(--ink);
+    background: var(--bg); resize: vertical;
+  }
+  .summary-chart { display:grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin: 14px 0; }
+  .summary-chip { background: var(--bg); border-radius: 12px; padding: 10px; text-align:center; }
+  .summary-chip .lab { font-weight:800; font-size:13px; margin-top:6px; }
+  .summary-chip .deg { font-size:11px; color: var(--ink-soft); }
+
+  /* Drawing canvas */
+  .draw-wrap { text-align:center; }
+  svg.draw-svg { background: var(--bg); border-radius: 14px; touch-action: none; max-width: 100%; }
+  .draw-status { font-weight:800; margin: 10px 0; font-size:14.5px; }
+  .target-badge { display:inline-block; background: var(--accent, var(--indigo)); color:#fff; border-radius: 999px; padding: 4px 14px; font-size:13px; font-weight:700; margin-bottom: 10px; }
+
+  footer.appfoot { text-align:center; color: var(--ink-soft); font-size:12.5px; margin-top: 26px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <svg class="deco" viewBox="0 0 100 100"><polygon points="50,5 95,35 80,90 20,90 5,35" fill="#fff"/></svg>
+    <h1>Amoha's Shape &amp; Angle Lab</h1>
+    <p>Practice angles, lines, and polygons — then get ready to teach your friends how they work!</p>
+    <div class="stars-row" id="overallProgress"></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <h3 id="sidebarTitle">Lessons</h3>
+      <div id="lessonList"></div>
+    </div>
+    <div class="panel" id="panel"></div>
+  </div>
+
+  <footer class="appfoot">Made for Amoha · your progress is saved right here in this app</footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------------
+   DATA
+--------------------------------------------------------------- */
+const TOPICS = {
+  angles: { label: "Angles", ico: "📐", accent: "#4B3F8A" },
+  lines:  { label: "Lines",  ico: "📏", accent: "#2FB6A5" },
+  polygons: { label: "Polygons", ico: "⬡", accent: "#FF6B5B" }
+};
+
+/* ---------- SVG helpers ---------- */
+function svgWrap(inner, size=150){
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+function angleSVG(deg, size=150, opts={}){
+  const cx = size*0.22, cy = size*0.8;
+  const L = size*0.66;
+  const rad = deg*Math.PI/180;
+  const x1 = cx + L, y1 = cy;
+  const x2 = cx + L*Math.cos(rad), y2 = cy - L*Math.sin(rad);
+  const arcR = size*0.22;
+  const largeArc = deg > 180 ? 1 : 0;
+  const ax1 = cx + arcR, ay1 = cy;
+  const ax2 = cx + arcR*Math.cos(rad), ay2 = cy - arcR*Math.sin(rad);
+  const stroke = opts.stroke || "#4B3F8A";
+  const sweep = 0;
+  return svgWrap(`
+    <line x1="${cx}" y1="${cy}" x2="${x1}" y2="${y1}" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M ${ax1} ${ay1} A ${arcR} ${arcR} 0 ${largeArc} ${sweep} ${ax2} ${ay2}" fill="none" stroke="#FF6B5B" stroke-width="3"/>
+    <circle cx="${cx}" cy="${cy}" r="4" fill="${stroke}"/>
+  `, size);
+}
+function linePairSVG(kind, size=150){
+  const stroke = "#4B3F8A";
+  let inner = "";
+  if(kind==="parallel"){
+    inner = `<line x1="20" y1="45" x2="130" y2="45" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+              <line x1="20" y1="100" x2="130" y2="100" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+              <path d="M60 40 l8 5 l-8 5" fill="none" stroke="#FF6B5B" stroke-width="2.5"/>
+              <path d="M60 95 l8 5 l-8 5" fill="none" stroke="#FF6B5B" stroke-width="2.5"/>`;
+  } else if(kind==="perpendicular"){
+    inner = `<line x1="25" y1="120" x2="25" y2="20" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+              <line x1="20" y1="115" x2="130" y2="115" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+              <rect x="25" y="103" width="12" height="12" fill="none" stroke="#FF6B5B" stroke-width="2.5"/>`;
+  } else if(kind==="intersecting"){
+    inner = `<line x1="15" y1="30" x2="135" y2="120" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+              <line x1="130" y1="25" x2="20" y2="125" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>`;
+  } else if(kind==="horizontal"){
+    inner = `<line x1="15" y1="75" x2="135" y2="75" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>`;
+  } else if(kind==="vertical"){
+    inner = `<line x1="75" y1="15" x2="75" y2="135" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>`;
+  } else if(kind==="ray"){
+    inner = `<line x1="15" y1="75" x2="135" y2="75" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="15" cy="75" r="4" fill="${stroke}"/>
+              <path d="M128 68 l10 7 l-10 7" fill="none" stroke="${stroke}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  } else if(kind==="segment"){
+    inner = `<line x1="20" y1="75" x2="130" y2="75" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="20" cy="75" r="4" fill="${stroke}"/><circle cx="130" cy="75" r="4" fill="${stroke}"/>`;
+  } else if(kind==="line"){
+    inner = `<line x1="10" y1="75" x2="140" y2="75" stroke="${stroke}" stroke-width="5" stroke-linecap="round"/>
+              <path d="M13 68 l-10 7 l10 7" fill="none" stroke="${stroke}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M127 68 l10 7 l-10 7" fill="none" stroke="${stroke}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  return svgWrap(inner, size);
+}
+function polygonSVG(sides, size=150, opts={}){
+  const cx=size/2, cy=size/2, r=size*0.38;
+  let pts=[];
+  for(let i=0;i<sides;i++){
+    const a = -Math.PI/2 + i*2*Math.PI/sides;
+    pts.push([cx+r*Math.cos(a), cy+r*Math.sin(a)]);
+  }
+  const irregular = opts.irregular;
+  if(irregular){
+    pts = pts.map(([x,y],i)=>{
+      const jitter = (i%2===0)? 0.7 : 1.15;
+      return [cx+(x-cx)*jitter, cy+(y-cy)*jitter];
+    });
+  }
+  const pointStr = pts.map(p=>p.join(",")).join(" ");
+  const stroke = opts.stroke || "#4B3F8A";
+  const fill = opts.fill || "rgba(75,63,138,0.12)";
+  return svgWrap(`<polygon points="${pointStr}" fill="${fill}" stroke="${stroke}" stroke-width="4" stroke-linejoin="round"/>`, size);
+}
+
+/* ---------- Lesson content ---------- */
+const LESSONS = { angles: [], lines: [], polygons: [] };
+
+/* ===== ANGLES (10) ===== */
+LESSONS.angles.push({
+  title: "What is an angle?",
+  explain: `<p>An <b>angle</b> is made when two straight <b>rays</b> meet at a point. That point is called the <b>vertex</b>.</p>
+  <p>Think of an angle like a book opening — the spine is the vertex, and the two covers are the rays.</p>`,
+  diagrams: [{svg: angleSVG(60), cap: "vertex + 2 rays"}],
+  questions: [
+    { q: "What do we call the point where the two rays of an angle meet?", opts:["Vertex","Ray","Line"], correct:0 },
+    { q: "An angle is made from two of these. What are they called?", opts:["Rays","Circles","Squares"], correct:0 },
+    { q: "How many rays does one angle have?", opts:["1","2","3"], correct:1 }
+  ]
+});
+LESSONS.angles.push({
+  title: "Right angles",
+  explain: `<p>A <b>right angle</b> measures exactly <b>90°</b>. It looks just like the corner of a piece of paper or a square.</p>
+  <p>You'll see a little square drawn in the corner of a right angle — that's the symbol that means "exactly 90°."</p>`,
+  diagrams: [{svg: angleSVG(90), cap: "90° — right angle"}],
+  questions: [
+    { q: "A right angle measures exactly how many degrees?", opts:["45°","90°","180°"], correct:1 },
+    { q: "Which of these is the right angle?", type:"svg", opts:[{deg:60},{deg:90},{deg:135}], correct:1 },
+    { q: "The little square symbol in a corner means the angle is...", opts:["Acute","A right angle","Straight"], correct:1 }
+  ]
+});
+LESSONS.angles.push({
+  title: "Acute angles",
+  explain: `<p>An <b>acute angle</b> is <b>smaller</b> than a right angle — it measures <b>less than 90°</b>. Acute angles look thin and sharp, like a slice of pizza.</p>`,
+  diagrams: [{svg: angleSVG(35), cap: "35° — acute"}],
+  questions: [
+    { q: "An acute angle is...", opts:["More than 90°","Less than 90°","Exactly 90°"], correct:1 },
+    { q: "Which of these is the acute angle?", type:"svg", opts:[{deg:25},{deg:100},{deg:170}], correct:0 },
+    { q: "Is a 45° angle acute?", opts:["Yes, because 45 is less than 90","No, because 45 is more than 90"], correct:0 }
+  ]
+});
+LESSONS.angles.push({
+  title: "Obtuse angles",
+  explain: `<p>An <b>obtuse angle</b> is <b>bigger</b> than a right angle but <b>smaller</b> than a straight line — it's between <b>90° and 180°</b>. Obtuse angles look wide and open.</p>`,
+  diagrams: [{svg: angleSVG(130), cap: "130° — obtuse"}],
+  questions: [
+    { q: "An obtuse angle is between which two numbers?", opts:["0° and 90°","90° and 180°","180° and 270°"], correct:1 },
+    { q: "Which of these is the obtuse angle?", type:"svg", opts:[{deg:50},{deg:90},{deg:150}], correct:2 },
+    { q: "150° is what type of angle?", opts:["Acute","Right","Obtuse"], correct:2 }
+  ]
+});
+LESSONS.angles.push({
+  title: "Straight angles",
+  explain: `<p>A <b>straight angle</b> measures exactly <b>180°</b>. It doesn't look like a corner at all — it looks like a straight line!</p>`,
+  diagrams: [{svg: angleSVG(180), cap: "180° — straight"}],
+  questions: [
+    { q: "A straight angle measures exactly how many degrees?", opts:["90°","180°","360°"], correct:1 },
+    { q: "A straight angle looks like a...", opts:["Corner","Straight line","Circle"], correct:1 },
+    { q: "Which of these is the straight angle?", type:"svg", opts:[{deg:90},{deg:150},{deg:180}], correct:2 }
+  ]
+});
+LESSONS.angles.push({
+  title: "Comparing angles by sight",
+  explain: `<p>You can compare two angles just by looking at how <b>wide open</b> they are — you don't always need to measure! The angle that opens wider is <b>bigger</b>.</p>`,
+  diagrams: [
+    {svg: angleSVG(40), cap: "Angle A"},
+    {svg: angleSVG(110), cap: "Angle B"}
+  ],
+  questions: [
+    { q: "Look at Angle A and Angle B above. Which one is bigger?", opts:["Angle A","Angle B","They're equal"], correct:1 },
+    { q: "If one angle opens wider than another, it is...", opts:["Smaller","Bigger","The same size"], correct:1 },
+    { q: "True or false: you must always use a protractor to tell which angle looks bigger.", opts:["True","False — you can compare by sight"], correct:1 }
+  ]
+});
+LESSONS.angles.push({
+  title: "Ordering angles: smallest to largest",
+  explain: `<p>To put angles in order, look at how wide each one opens. Line them up from the <b>narrowest</b> (smallest) to the <b>widest</b> (biggest).</p>`,
+  diagrams: [
+    {svg: angleSVG(20), cap: "A"},
+    {svg: angleSVG(95), cap: "B"},
+    {svg: angleSVG(160), cap: "C"}
+  ],
+  questions: [
+    { q: "Put A, B, C in order from smallest to largest.", opts:["A, B, C","C, B, A","B, A, C"], correct:0 },
+    { q: "Which letter above is the smallest angle?", opts:["A","B","C"], correct:0 },
+    { q: "Which letter above is the largest angle?", opts:["A","B","C"], correct:2 }
+  ]
+});
+LESSONS.angles.push({
+  title: "Angles in everyday objects",
+  explain: `<p>Angles are everywhere! A clock's hands, an open book, a slice of pie, and scissors all make angles.</p>
+  <p>Example: at <b>3:00</b>, the clock's hands point straight up and straight right — that's a <b>right angle (90°)</b>.</p>`,
+  diagrams: [{svg: angleSVG(90), cap: "clock at 3:00"}],
+  questions: [
+    { q: "At 3:00, a clock's hands form what type of angle?", opts:["Acute","Right angle","Obtuse"], correct:1 },
+    { q: "At 6:00, a clock's hands point in opposite directions. What angle is that?", opts:["Right angle (90°)","Straight angle (180°)","Acute angle"], correct:1 },
+    { q: "A slice of pizza usually has what kind of angle at the tip?", opts:["Acute","Obtuse","Straight"], correct:0 }
+  ]
+});
+LESSONS.angles.push({
+  title: "Angles in shapes",
+  explain: `<p>Shapes are made of angles at their corners! A <b>square</b> has 4 corners, and every one is a right angle (90°). A <b>triangle</b> has 3 corners, and its angles always add up to 180° in total.</p>`,
+  diagrams: [{svg: polygonSVG(4), cap:"square: 4 right angles"}, {svg: polygonSVG(3), cap:"triangle: 3 angles"}],
+  questions: [
+    { q: "How many right angles does a square have?", opts:["2","4","6"], correct:1 },
+    { q: "A triangle's three angles always add up to...", opts:["90°","180°","360°"], correct:1 },
+    { q: "How many corners (angles) does a triangle have?", opts:["3","4","5"], correct:0 }
+  ]
+});
+LESSONS.angles.push({
+  title: "Teach a friend! Angles review",
+  isReview: true,
+  explain: `<p>You've learned a lot about angles! Here's your quick-reference chart to help you teach a friend:</p>`,
+  summaryChart: [
+    {svg: angleSVG(35,110), lab:"Acute", deg:"< 90°"},
+    {svg: angleSVG(90,110), lab:"Right", deg:"= 90°"},
+    {svg: angleSVG(130,110), lab:"Obtuse", deg:"90°–180°"},
+    {svg: angleSVG(180,110), lab:"Straight", deg:"= 180°"}
+  ],
+  teachPrompt: "In your own words, explain to a friend: what is an angle, and what are the four types you learned?",
+  questions: [
+    { q: "Which angle type is smaller than 90°?", opts:["Acute","Obtuse","Straight"], correct:0 },
+    { q: "Which angle type is exactly 90°?", opts:["Acute","Right","Obtuse"], correct:1 },
+    { q: "Which angle type is between 90° and 180°?", opts:["Right","Obtuse","Straight"], correct:1 },
+    { q: "Which angle type looks like a straight line?", opts:["Right","Acute","Straight"], correct:2 },
+    { q: "Which is bigger: an acute angle or an obtuse angle?", opts:["Acute","Obtuse","They're always equal"], correct:1 }
+  ]
+});
+
+/* ===== LINES (10) ===== */
+LESSONS.lines.push({
+  title: "What is a line?",
+  explain: `<p>A <b>line</b> goes on forever in both directions (shown with arrows on both ends). A <b>line segment</b> has two endpoints — it stops on both sides. A <b>ray</b> starts at one point and goes on forever in just one direction (shown with one arrow).</p>`,
+  diagrams: [
+    {svg: linePairSVG("line"), cap:"line"},
+    {svg: linePairSVG("segment"), cap:"line segment"},
+    {svg: linePairSVG("ray"), cap:"ray"}
+  ],
+  questions: [
+    { q: "Which one has two endpoints and stops on both sides?", opts:["Line","Line segment","Ray"], correct:1 },
+    { q: "Which one starts at a point and goes on forever in just one direction?", opts:["Ray","Line segment","Line"], correct:0 },
+    { q: "A line has arrows on how many ends?", opts:["0","1","2"], correct:2 }
+  ]
+});
+LESSONS.lines.push({
+  title: "Parallel lines",
+  explain: `<p><b>Parallel lines</b> never meet — they stay the same distance apart forever, like train tracks or the lines on notebook paper.</p>`,
+  diagrams: [{svg: linePairSVG("parallel"), cap:"parallel lines"}],
+  questions: [
+    { q: "Parallel lines...", opts:["Always cross","Never meet","Form a right angle"], correct:1 },
+    { q: "Which is an example of parallel lines?", opts:["Train tracks","A plus sign (+)","An X shape"], correct:0 },
+    { q: "Which picture shows parallel lines?", type:"svg-line", opts:["parallel","perpendicular","intersecting"], correct:0 }
+  ]
+});
+LESSONS.lines.push({
+  title: "Perpendicular lines",
+  explain: `<p><b>Perpendicular lines</b> cross each other and form a <b>right angle (90°)</b>, like the corner of a window or a plus sign.</p>`,
+  diagrams: [{svg: linePairSVG("perpendicular"), cap:"perpendicular lines"}],
+  questions: [
+    { q: "Perpendicular lines form angles of exactly...", opts:["45°","90°","180°"], correct:1 },
+    { q: "Which picture shows perpendicular lines?", type:"svg-line", opts:["intersecting","perpendicular","parallel"], correct:1 },
+    { q: "A window frame's corner is usually an example of...", opts:["Perpendicular lines","Parallel lines","Curved lines"], correct:0 }
+  ]
+});
+LESSONS.lines.push({
+  title: "Intersecting lines",
+  explain: `<p><b>Intersecting lines</b> are any two lines that cross at one point. They don't have to cross at a right angle — perpendicular lines are actually a special type of intersecting lines!</p>`,
+  diagrams: [{svg: linePairSVG("intersecting"), cap:"intersecting lines"}],
+  questions: [
+    { q: "Intersecting lines...", opts:["Never meet","Cross at one point","Are always the same length"], correct:1 },
+    { q: "Are perpendicular lines also intersecting lines?", opts:["Yes","No"], correct:0 },
+    { q: "Which picture shows lines that cross but NOT at a right angle?", type:"svg-line", opts:["intersecting","perpendicular","parallel"], correct:0 }
+  ]
+});
+LESSONS.lines.push({
+  title: "Horizontal and vertical lines",
+  explain: `<p>A <b>horizontal</b> line goes flat, side to side — like the horizon. A <b>vertical</b> line goes straight up and down.</p>`,
+  diagrams: [
+    {svg: linePairSVG("horizontal"), cap:"horizontal"},
+    {svg: linePairSVG("vertical"), cap:"vertical"}
+  ],
+  questions: [
+    { q: "A line that goes flat, side to side, is called...", opts:["Horizontal","Vertical","Diagonal"], correct:0 },
+    { q: "A line that goes straight up and down is called...", opts:["Horizontal","Vertical","Curved"], correct:1 },
+    { q: "The floor and the wall meet to form what kind of lines?", opts:["One horizontal, one vertical","Both horizontal","Both vertical"], correct:0 }
+  ]
+});
+LESSONS.lines.push({
+  title: "Lines and angles together",
+  explain: `<p>When two lines cross, they make <b>4 angles</b> around the crossing point. The angles directly across from each other (called <b>vertical angles</b>) are always <b>equal</b> to each other.</p>`,
+  diagrams: [{svg: linePairSVG("intersecting"), cap:"4 angles form here"}],
+  questions: [
+    { q: "When two lines cross, how many angles form around the point?", opts:["2","4","6"], correct:1 },
+    { q: "Angles directly across from each other when lines cross are always...", opts:["Equal","Different","Right angles"], correct:0 },
+    { q: "If two lines are perpendicular, all 4 angles they form are...", opts:["90° each","Different sizes","Obtuse"], correct:0 }
+  ]
+});
+LESSONS.lines.push({
+  title: "Reasoning: angles on a line",
+  explain: `<p>Here's a powerful rule: angles that sit together on a <b>straight line</b> always add up to <b>180°</b>. So if you know one angle, you can figure out the other!</p>
+  <p>Example: one angle is 120°. The other angle on the same straight line is 180° − 120° = <b>60°</b>.</p>`,
+  diagrams: [{svg: angleSVG(120), cap:"120° + 60° = 180°"}],
+  questions: [
+    { q: "Two angles sit on a straight line. One is 110°. What is the other?", opts:["60°","70°","80°"], correct:1 },
+    { q: "Two angles on a straight line always add up to...", opts:["90°","180°","360°"], correct:1 },
+    { q: "One angle on a line is 95°. What is the other?", opts:["75°","85°","95°"], correct:1 }
+  ]
+});
+LESSONS.lines.push({
+  title: "Reasoning: missing angle puzzles",
+  explain: `<p>Two angles that fit together to make a right angle (90°) always add up to 90°. Let's practice finding the missing piece.</p>
+  <p>Example: two angles together make a right angle. One is 35°. The other is 90° − 35° = <b>55°</b>.</p>`,
+  diagrams: [{svg: angleSVG(90), cap:"35° + 55° = 90°"}],
+  questions: [
+    { q: "Two angles together make a right angle (90°). One is 35°. What's the other?", opts:["45°","55°","65°"], correct:1 },
+    { q: "Two angles together make a straight line (180°). One is 45°. What's the other?", opts:["125°","135°","145°"], correct:1 },
+    { q: "Two angles make a right angle. One is 20°. What's the other?", opts:["60°","70°","80°"], correct:1 }
+  ]
+});
+LESSONS.lines.push({
+  title: "Applying lines to equations",
+  explain: `<p>We can turn angle puzzles into simple equations! If two angles on a straight line add up to 180°, and one angle is a mystery number <b>x</b>, we can write: <b>x + (known angle) = 180</b>, then solve for x.</p>
+  <p>Example: x + 70 = 180, so x = 180 − 70 = <b>110</b>.</p>`,
+  diagrams: [],
+  questions: [
+    { q: "x + 60 = 180. What is x?", opts:["100","110","120"], correct:2 },
+    { q: "x + 25 = 90. What is x?", opts:["55°","65°","75°"], correct:1 },
+    { q: "x + 100 = 180. What is x?", opts:["70","80","90"], correct:1 }
+  ]
+});
+LESSONS.lines.push({
+  title: "Teach a friend! Lines review",
+  isReview: true,
+  explain: `<p>Great work! Here's your quick-reference chart for lines:</p>`,
+  summaryChart: [
+    {svg: linePairSVG("parallel",110), lab:"Parallel", deg:"never meet"},
+    {svg: linePairSVG("perpendicular",110), lab:"Perpendicular", deg:"cross at 90°"},
+    {svg: linePairSVG("intersecting",110), lab:"Intersecting", deg:"cross anywhere"}
+  ],
+  teachPrompt: "In your own words, explain to a friend: what's the difference between parallel and perpendicular lines? How do you find a missing angle on a straight line?",
+  questions: [
+    { q: "Which type of lines never meet?", opts:["Parallel","Perpendicular","Intersecting"], correct:0 },
+    { q: "Which type of lines always cross at 90°?", opts:["Parallel","Perpendicular","Horizontal"], correct:1 },
+    { q: "Angles on a straight line add up to...", opts:["90°","180°","270°"], correct:1 },
+    { q: "x + 40 = 180. What is x?", opts:["120","130","140"], correct:2 },
+    { q: "Two angles make a right angle. One is 15°. What's the other?", opts:["65°","75°","85°"], correct:1 }
+  ]
+});
+
+/* ===== POLYGONS (10) ===== */
+LESSONS.polygons.push({
+  title: "What is a polygon?",
+  explain: `<p>A <b>polygon</b> is a closed shape made only of straight sides — no curves, and no gaps. The sides connect end to end all the way around.</p>`,
+  diagrams: [{svg: polygonSVG(5), cap:"a polygon"}],
+  questions: [
+    { q: "A polygon is made of...", opts:["Only straight sides","Curved sides","A mix of dots"], correct:0 },
+    { q: "Does a polygon have any gaps in its outline?", opts:["Yes","No, it's fully closed"], correct:1 },
+    { q: "Is a circle a polygon?", opts:["Yes","No, because it's curved, not straight"], correct:1 }
+  ]
+});
+LESSONS.polygons.push({
+  title: "Triangles",
+  explain: `<p>A <b>triangle</b> is a polygon with <b>3 sides</b> and <b>3 angles</b>. It's the simplest polygon there is!</p>`,
+  diagrams: [{svg: polygonSVG(3), cap:"triangle"}],
+  questions: [
+    { q: "How many sides does a triangle have?", opts:["3","4","5"], correct:0 },
+    { q: "How many angles does a triangle have?", opts:["2","3","4"], correct:1 },
+    { q: "A triangle's angles always add up to...", opts:["90°","180°","270°"], correct:1 }
+  ]
+});
+LESSONS.polygons.push({
+  title: "Quadrilaterals",
+  explain: `<p>A <b>quadrilateral</b> is any polygon with <b>4 sides</b>. Squares, rectangles, and rhombuses are all quadrilaterals.</p>`,
+  diagrams: [{svg: polygonSVG(4), cap:"quadrilateral"}],
+  questions: [
+    { q: "How many sides does a quadrilateral have?", opts:["3","4","5"], correct:1 },
+    { q: "Which of these is a quadrilateral?", opts:["A square","A triangle","A pentagon"], correct:0 },
+    { q: "How many angles does a quadrilateral have?", opts:["3","4","6"], correct:1 }
+  ]
+});
+LESSONS.polygons.push({
+  title: "Pentagons and hexagons",
+  explain: `<p>A <b>pentagon</b> has <b>5 sides</b> (think of a baseball home plate!). A <b>hexagon</b> has <b>6 sides</b> (think of a honeycomb cell).</p>`,
+  diagrams: [{svg: polygonSVG(5), cap:"pentagon (5)"},{svg: polygonSVG(6), cap:"hexagon (6)"}],
+  questions: [
+    { q: "How many sides does a pentagon have?", opts:["4","5","6"], correct:1 },
+    { q: "How many sides does a hexagon have?", opts:["5","6","7"], correct:1 },
+    { q: "A honeycomb cell is usually shaped like a...", opts:["Pentagon","Hexagon","Triangle"], correct:1 }
+  ]
+});
+LESSONS.polygons.push({
+  title: "Regular vs. irregular polygons",
+  explain: `<p>A <b>regular</b> polygon has all sides and all angles equal. An <b>irregular</b> polygon has sides or angles that are different sizes.</p>`,
+  diagrams: [{svg: polygonSVG(5), cap:"regular pentagon"}, {svg: polygonSVG(5,150,{irregular:true}), cap:"irregular pentagon"}],
+  questions: [
+    { q: "A regular polygon has...", opts:["All sides and angles equal","Only straight angles","Curved sides"], correct:0 },
+    { q: "An irregular polygon has...", opts:["Sides/angles of different sizes","No sides","Only right angles"], correct:0 },
+    { q: "Is a square always a regular polygon?", opts:["Yes, all sides and angles are equal","No"], correct:0 }
+  ]
+});
+LESSONS.polygons.push({
+  title: "Sides, vertices, and angles",
+  explain: `<p>A <b>vertex</b> is a corner where two sides meet (plural: vertices). Here's the cool part: a polygon always has the <b>same number</b> of sides, vertices, and angles!</p>`,
+  diagrams: [{svg: polygonSVG(6), cap:"hexagon: 6 sides, 6 vertices, 6 angles"}],
+  questions: [
+    { q: "A hexagon has how many vertices?", opts:["5","6","7"], correct:1 },
+    { q: "If a polygon has 7 sides, how many angles does it have?", opts:["6","7","8"], correct:1 },
+    { q: "A vertex is...", opts:["A corner where two sides meet","A curved edge","The middle of a shape"], correct:0 }
+  ]
+});
+LESSONS.polygons.push({
+  title: "Drawing polygons",
+  explain: `<p>Now it's your turn to draw! Tap to place each corner (vertex) of your polygon, then tap <b>Close Shape</b> to connect the last point back to the first.</p>`,
+  isDraw: true,
+  drawChallenges: [
+    { sides: 3, name: "triangle" },
+    { sides: 4, name: "quadrilateral" },
+    { sides: 6, name: "hexagon" }
+  ],
+  questions: []
+});
+LESSONS.polygons.push({
+  title: "Polygon properties reasoning",
+  explain: `<p>Once you know the pattern of polygon names, you can reason your way to new ones.</p>
+  <p>Example: a shape with one more side than a pentagon (5) has 6 sides — that's a hexagon!</p>`,
+  diagrams: [],
+  questions: [
+    { q: "A polygon has 4 sides. What is it called?", opts:["Triangle","Quadrilateral","Pentagon"], correct:1 },
+    { q: "A shape has 2 fewer sides than a hexagon (6). What is it?", opts:["Quadrilateral (4 sides)","Pentagon (5 sides)","Triangle (3 sides)"], correct:0 },
+    { q: "A shape has one more side than a quadrilateral (4). What is it?", opts:["Triangle","Pentagon","Hexagon"], correct:1 }
+  ]
+});
+LESSONS.polygons.push({
+  title: "Problem solving with polygons",
+  explain: `<p>Let's combine what you know about angles and polygons to solve problems.</p>
+  <p>Example: a triangle's angles add up to 180°. Two angles are 60° and 70°. The third is 180 − 60 − 70 = <b>50°</b>.</p>`,
+  diagrams: [],
+  questions: [
+    { q: "A triangle has angles of 60° and 70°. What is the third angle?", opts:["40°","50°","60°"], correct:1 },
+    { q: "A square has 4 right angles (90° each). What is the sum of all its angles?", opts:["180°","270°","360°"], correct:2 },
+    { q: "A triangle has angles of 90° and 40°. What is the third angle?", opts:["40°","50°","60°"], correct:1 }
+  ]
+});
+LESSONS.polygons.push({
+  title: "Teach a friend! Polygons review",
+  isReview: true,
+  explain: `<p>Amazing work! Here's your quick-reference chart for polygons:</p>`,
+  summaryChart: [
+    {svg: polygonSVG(3,110), lab:"Triangle", deg:"3 sides"},
+    {svg: polygonSVG(4,110), lab:"Quadrilateral", deg:"4 sides"},
+    {svg: polygonSVG(5,110), lab:"Pentagon", deg:"5 sides"},
+    {svg: polygonSVG(6,110), lab:"Hexagon", deg:"6 sides"}
+  ],
+  teachPrompt: "In your own words, explain to a friend: what makes a shape a polygon, and how are regular and irregular polygons different?",
+  questions: [
+    { q: "How many sides does a pentagon have?", opts:["4","5","6"], correct:1 },
+    { q: "A regular polygon has...", opts:["Equal sides and angles","Curved sides","No angles"], correct:0 },
+    { q: "A polygon's number of sides always equals its number of...", opts:["Colors","Vertices","Curves"], correct:1 },
+    { q: "A triangle has angles 50° and 60°. What is the third?", opts:["60°","70°","80°"], correct:1 },
+    { q: "A shape has one more side than a hexagon (6). What is it?", opts:["Pentagon (5)","Heptagon (7)","Octagon (8)"], correct:1 }
+  ]
+});
+
+/* ---------------------------------------------------------------
+   STATE + PROGRESS
+--------------------------------------------------------------- */
+let state = { topic: "angles", lessonIndex: 0 };
+let progress = { angles:{}, lines:{}, polygons:{} };
+
+function loadProgress(){
+  try {
+    const raw = localStorage.getItem("amoha_geo_progress");
+    if(raw) progress = JSON.parse(raw);
+  } catch(e){ console.warn("progress load failed", e); }
+}
+function saveProgress(){
+  try { localStorage.setItem("amoha_geo_progress", JSON.stringify(progress)); }
+  catch(e){ console.warn("progress save failed", e); }
+}
+function markDone(topic, idx){
+  progress[topic] = progress[topic] || {};
+  progress[topic][idx] = true;
+  saveProgress();
+}
+function countDone(topic){
+  return Object.keys(progress[topic]||{}).filter(k=>progress[topic][k]).length;
+}
+
+/* ---------------------------------------------------------------
+   RENDER
+--------------------------------------------------------------- */
+function renderTabs(){
+  const el = document.getElementById("tabs");
+  el.innerHTML = "";
+  Object.keys(TOPICS).forEach(key=>{
+    const t = TOPICS[key];
+    const done = countDone(key);
+    const btn = document.createElement("button");
+    btn.className = "tab-btn" + (state.topic===key ? " active":"");
+    btn.style.setProperty("--accent", t.accent);
+    btn.innerHTML = `<span class="ico">${t.ico}</span><span><div>${t.label}</div><div class="meta">${done}/10 lessons</div></span>`;
+    btn.onclick = ()=>{ state.topic = key; state.lessonIndex = 0; renderAll(); };
+    el.appendChild(btn);
+  });
+}
+function renderOverall(){
+  const total = 30;
+  const done = countDone("angles")+countDone("lines")+countDone("polygons");
+  document.getElementById("overallProgress").innerHTML =
+    `⭐ ${done} of ${total} lessons complete`;
+}
+function renderSidebar(){
+  const accent = TOPICS[state.topic].accent;
+  document.getElementById("sidebarTitle").textContent = TOPICS[state.topic].label + " lessons";
+  const list = document.getElementById("lessonList");
+  list.innerHTML = "";
+  LESSONS[state.topic].forEach((les, i)=>{
+    const done = !!(progress[state.topic] && progress[state.topic][i]);
+    const item = document.createElement("div");
+    item.className = "lesson-item" + (i===state.lessonIndex ? " current":"") + (done ? " done":"");
+    item.style.setProperty("--accent", accent);
+    item.innerHTML = `<span class="lesson-num">${done ? "✓" : (i+1)}</span><span class="lesson-title">${les.title}</span>`;
+    item.onclick = ()=>{ state.lessonIndex = i; renderAll(); };
+    list.appendChild(item);
+  });
+}
+
+function optionButtonHTML(){ return ""; }
+
+function renderPanel(){
+  const accent = TOPICS[state.topic].accent;
+  const panel = document.getElementById("panel");
+  panel.style.setProperty("--accent", accent);
+  const les = LESSONS[state.topic][state.lessonIndex];
+  const isDone = !!(progress[state.topic] && progress[state.topic][state.lessonIndex]);
+
+  let html = `<div class="eyebrow">${TOPICS[state.topic].label} · Lesson ${state.lessonIndex+1} of 10</div>`;
+  html += `<h2>${les.title}</h2>`;
+  html += `<div class="explain">${les.explain}</div>`;
+
+  if(les.diagrams && les.diagrams.length){
+    html += `<div class="diagram-row">`;
+    les.diagrams.forEach(d=>{
+      html += `<div class="diagram-card">${d.svg}<div class="cap">${d.cap}</div></div>`;
+    });
+    html += `</div>`;
+  }
+
+  if(les.summaryChart){
+    html += `<div class="summary-chart">`;
+    les.summaryChart.forEach(c=>{
+      html += `<div class="summary-chip">${c.svg}<div class="lab">${c.lab}</div><div class="deg">${c.deg}</div></div>`;
+    });
+    html += `</div>`;
+  }
+
+  if(les.isDraw){
+    html += `<hr class="divider"><div id="drawArea"></div>`;
+  }
+
+  if(les.teachPrompt){
+    html += `<hr class="divider"><div class="q-block"><div class="q-text">🗣️ ${les.teachPrompt}</div>
+      <textarea class="teach-box" id="teachBox" placeholder="Type your explanation here..."></textarea></div>`;
+  }
+
+  if(les.questions && les.questions.length){
+    html += `<hr class="divider">`;
+    les.questions.forEach((q,qi)=>{
+      html += `<div class="q-block" data-qi="${qi}">`;
+      html += `<div class="q-text">${qi+1}. ${q.q}</div>`;
+      if(q.type==="svg"){
+        html += `<div class="opt-grid">`;
+        q.opts.forEach((o,oi)=>{
+          html += `<button class="opt-btn svg-opt" data-oi="${oi}">${angleSVG(o.deg,110)}</button>`;
+        });
+        html += `</div>`;
+      } else if(q.type==="svg-line"){
+        html += `<div class="opt-grid">`;
+        q.opts.forEach((o,oi)=>{
+          html += `<button class="opt-btn svg-opt" data-oi="${oi}">${linePairSVG(o,110)}</button>`;
+        });
+        html += `</div>`;
+      } else {
+        html += `<div class="opt-grid text-opts">`;
+        q.opts.forEach((o,oi)=>{
+          html += `<button class="opt-btn" data-oi="${oi}">${o}</button>`;
+        });
+        html += `</div>`;
+      }
+      html += `<div class="feedback" data-fb></div>`;
+      html += `</div>`;
+    });
+  }
+
+  html += `<div class="btn-row">`;
+  html += `<button class="btn secondary" id="prevBtn" ${state.lessonIndex===0?'disabled':''}>← Previous</button>`;
+  html += `<button class="btn" id="completeBtn">${isDone ? "✓ Lesson complete" : "Mark lesson complete"}</button>`;
+  html += `<button class="btn secondary" id="nextBtn" ${state.lessonIndex===LESSONS[state.topic].length-1?'disabled':''}>Next →</button>`;
+  html += `</div>`;
+
+  panel.innerHTML = html;
+
+  // wire question buttons
+  panel.querySelectorAll(".q-block").forEach(block=>{
+    const qi = +block.dataset.qi;
+    const q = les.questions[qi];
+    const fb = block.querySelector("[data-fb]");
+    block.querySelectorAll(".opt-btn").forEach(btn=>{
+      btn.onclick = ()=>{
+        const oi = +btn.dataset.oi;
+        const correct = oi === q.correct;
+        block.querySelectorAll(".opt-btn").forEach(b=>b.disabled = true);
+        btn.classList.add(correct ? "correct" : "wrong");
+        if(!correct){
+          const correctBtn = block.querySelector(`[data-oi="${q.correct}"]`);
+          if(correctBtn) correctBtn.classList.add("correct");
+        }
+        fb.textContent = correct ? "Nice work! That's right. 🎉" : "Not quite — the correct answer is highlighted in green. Keep going!";
+        fb.className = "feedback " + (correct ? "good":"bad");
+      };
+    });
+  });
+
+  document.getElementById("prevBtn").onclick = ()=>{ if(state.lessonIndex>0){ state.lessonIndex--; renderAll(); } };
+  document.getElementById("nextBtn").onclick = ()=>{ if(state.lessonIndex<LESSONS[state.topic].length-1){ state.lessonIndex++; renderAll(); } };
+  document.getElementById("completeBtn").onclick = ()=>{
+    markDone(state.topic, state.lessonIndex);
+    renderAll();
+  };
+
+  if(les.isDraw) setupDrawArea(les);
+}
+
+function renderAll(){
+  renderTabs();
+  renderOverall();
+  renderSidebar();
+  renderPanel();
+}
+
+/* ---------------------------------------------------------------
+   DRAWING LESSON
+--------------------------------------------------------------- */
+function setupDrawArea(les){
+  const area = document.getElementById("drawArea");
+  let challengeIdx = 0;
+  let points = [];
+  let closed = false;
+
+  function renderChallenge(){
+    points = []; closed = false;
+    const ch = les.drawChallenges[challengeIdx];
+    area.innerHTML = `
+      <div class="draw-wrap">
+        <div class="target-badge">Draw a ${ch.name} (${ch.sides} corners)</div>
+        <div><svg class="draw-svg" id="drawSvg" width="320" height="280" viewBox="0 0 320 280"></svg></div>
+        <div class="draw-status" id="drawStatus">Tap anywhere to place your first corner.</div>
+        <div class="btn-row" style="justify-content:center">
+          <button class="btn secondary" id="undoBtn">Undo point</button>
+          <button class="btn secondary" id="clearBtn">Clear</button>
+          <button class="btn" id="closeBtn" disabled>Close shape</button>
+        </div>
+      </div>`;
+    const svg = document.getElementById("drawSvg");
+    const status = document.getElementById("drawStatus");
+    const closeBtn = document.getElementById("closeBtn");
+
+    function draw(){
+      svg.innerHTML = "";
+      points.forEach((p,i)=>{
+        const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+        c.setAttribute("cx",p.x); c.setAttribute("cy",p.y); c.setAttribute("r",6);
+        c.setAttribute("fill", TOPICS.polygons.accent);
+        svg.appendChild(c);
+      });
+      if(points.length>1){
+        for(let i=0;i<points.length-1;i++){
+          const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+          l.setAttribute("x1",points[i].x); l.setAttribute("y1",points[i].y);
+          l.setAttribute("x2",points[i+1].x); l.setAttribute("y2",points[i+1].y);
+          l.setAttribute("stroke", TOPICS.polygons.accent); l.setAttribute("stroke-width",4);
+          l.setAttribute("stroke-linecap","round");
+          svg.appendChild(l);
+        }
+      }
+      if(closed && points.length>2){
+        const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+        l.setAttribute("x1",points[points.length-1].x); l.setAttribute("y1",points[points.length-1].y);
+        l.setAttribute("x2",points[0].x); l.setAttribute("y2",points[0].y);
+        l.setAttribute("stroke", TOPICS.polygons.accent); l.setAttribute("stroke-width",4);
+        l.setAttribute("stroke-linecap","round");
+        svg.appendChild(l);
+      }
+    }
+
+    svg.addEventListener("click", (e)=>{
+      if(closed) return;
+      const rect = svg.getBoundingClientRect();
+      const scaleX = 320/rect.width, scaleY = 280/rect.height;
+      const x = (e.clientX-rect.left)*scaleX, y=(e.clientY-rect.top)*scaleY;
+      points.push({x,y});
+      closeBtn.disabled = points.length < 3;
+      status.textContent = `${points.length} corner${points.length===1?'':'s'} placed. ${points.length<ch.sides ? `Keep going — a ${ch.name} needs ${ch.sides}.` : (points.length===ch.sides ? "That's enough corners — tap Close shape!" : "That's more than needed — tap Close shape or Clear to restart.")}`;
+      draw();
+    });
+    document.getElementById("undoBtn").onclick = ()=>{ points.pop(); closed=false; closeBtn.disabled = points.length<3; status.textContent = `${points.length} corner(s) placed.`; draw(); };
+    document.getElementById("clearBtn").onclick = renderChallenge;
+    closeBtn.onclick = ()=>{
+      closed = true;
+      draw();
+      const correct = points.length === ch.sides;
+      status.innerHTML = correct
+        ? `🎉 Perfect! You drew a shape with ${points.length} corners — that's a ${ch.name}!`
+        : `You drew ${points.length} corners, but a ${ch.name} needs ${ch.sides}. Tap Clear and try again.`;
+      if(correct){
+        setTimeout(()=>{
+          challengeIdx++;
+          if(challengeIdx < les.drawChallenges.length){
+            renderChallenge();
+          } else {
+            area.innerHTML = `<div class="draw-wrap"><div class="draw-status">🌟 You drew every shape correctly! Great job.</div></div>`;
+          }
+        }, 1400);
+      }
+    };
+  }
+  renderChallenge();
+}
+
+/* ---------------------------------------------------------------
+   INIT
+--------------------------------------------------------------- */
+loadProgress();
+renderAll();
+</script>
+</body>
+</html>
